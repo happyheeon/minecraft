@@ -2,14 +2,16 @@ FROM eclipse-temurin:21-jre
 
 ARG DOWNLOAD_URL
 
-# Download Paperclip
-ADD "${DOWNLOAD_URL}" /opt/minecraft/paperspigot.jar
+# Download Paperclip using curl
+RUN apt update && apt install -y curl && \
+    curl -fSL "${DOWNLOAD_URL}" -o /opt/minecraft/paperspigot.jar && \
+    test -s /opt/minecraft/paperspigot.jar
 
 # Add rcon-cli
 COPY --from=docker.io/itzg/rcon-cli:latest /rcon-cli /usr/local/bin/rcon-cli
 
-# Install dependencies
-RUN apt update && apt install -y gosu webp adduser && rm -rf /var/lib/apt/lists/*
+# Install additional dependencies
+RUN apt install -y gosu webp adduser && rm -rf /var/lib/apt/lists/*
 
 # Expose Minecraft ports
 EXPOSE 25565/tcp 25565/udp
